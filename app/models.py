@@ -1,4 +1,10 @@
 from app import db
+from enum import Enum
+
+
+class StatusEnum(db.Enum):
+    draft = "Draft"
+    completed = "Completed"
 
 class JobHazardAnalysisPreventativeMeasure(db.Model):
     # One to one with Hazard
@@ -65,5 +71,6 @@ class JobHazardAnalysis(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(128), nullable=False)
     author = db.Column(db.String(50), nullable=False)
+    status = db.Column(StatusEnum, default=StatusEnum.draft, nullable=False)
     
     tasks = db.relationship('JobHazardAnalysisTask', order_by=JobHazardAnalysisTask.id, back_populates='job_hazard_analysis')
