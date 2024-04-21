@@ -58,9 +58,6 @@ class JobHazardAnalysisTask(db.Model):
             ).scalar()
             self.step = (max_step or 0) + 1
 
-    def __repr__(self):
-        return f'<JobHazardAnalysisTask {self.id}>'
-
 
 class JobHazardAnalysis(db.Model):
     __tablename__ = 'job_hazard_analysis'
@@ -70,6 +67,3 @@ class JobHazardAnalysis(db.Model):
     author = db.Column(db.String(50), nullable=False)
     
     tasks = db.relationship('JobHazardAnalysisTask', order_by=JobHazardAnalysisTask.id, back_populates='job_hazard_analysis')
-
-    def __repr__(self):
-        return f'<JobHazardAnalysis {self.id}>'
