@@ -56,7 +56,7 @@ class JobHazardAnalysisTask(db.Model):
             max_step = db.session.query(db.func.max(JobHazardAnalysisTask.step)).filter_by(
                 job_hazard_analysis_id=self.job_hazard_analysis_id
             ).scalar()
-            self.step = (max_step or 0) + 1
+            self.step = (max_step or 1) + 1
 
 
 class JobHazardAnalysis(db.Model):
