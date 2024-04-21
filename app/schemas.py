@@ -1,5 +1,5 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from models import *
+from app.models import *
 
 class JobHazardAnalysisSchema(SQLAlchemyAutoSchema):
     class Meta:
