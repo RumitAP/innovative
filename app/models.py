@@ -1,42 +1,41 @@
 from app import db
 from enum import Enum
+from app.mixins import HazardMixin
 
 
-class StatusEnum(db.Enum):
+class StatusEnum(Enum):
     draft = "Draft"
     completed = "Completed"
 
-class JobHazardAnalysisPreventativeMeasure(db.Model):
-    # One to one with Hazard
+class JobHazardAnalysisPreventativeMeasure(HazardMixin, db.Model):
     __tablename__ = 'job_hazard_analysis_task_hazard_preventative_measure'
-    
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    job_harazrd_analysis_task_hazard_id = db.Column(db.Integer, db.ForeignKey('job_hazard_analysis_task_hazard.id'), nullable=False, index=True)
-    description = db.Column(db.String, nullable=False)
-    
-    hazard = db.relationship('JobHazardAnalysisTaskHazard', back_populates='preventative_measure', uselist=False)
+    hazard = db.relationship('JobHazardAnalysisTaskHazard', back_populates='preventative_measures')
 
-class JobHazardAnalysisTaskConsequences(db.Model):
-    # One to many with Hazard
+class JobHazardAnalysisTaskConsequences(HazardMixin, db.Model):
     __tablename__ = 'job_hazard_analysis_task_consequence'
-    
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    job_harazrd_analysis_task_hazard_id = db.Column(db.Integer, db.ForeignKey('job_hazard_analysis_task_hazard.id'), nullable=False, index=True)
-    description = db.Column(db.String, nullable=False)
-    
     hazard = db.relationship('JobHazardAnalysisTaskHazard', back_populates='consequences')
 
 class JobHazardAnalysisTaskHazard(db.Model):
-    # One to many with Task
+    # Many to one with Task
     __tablename__ = 'job_hazard_analysis_task_hazard'
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     job_harazrd_analysis_task_id = db.Column(db.Integer, db.ForeignKey('job_hazard_analysis_task.id'), nullable=False, index=True)
-    description = db.Column(db.String, nullable=False)
+    description = db.Column(db.String, default="" ,nullable=False)
     
     task = db.relationship('JobHazardAnalysisTask', back_populates='hazards')
     consequences = db.relationship('JobHazardAnalysisTaskConsequences', order_by=JobHazardAnalysisTaskConsequences.id, back_populates='hazard')
-    preventative_measure = db.relationship('JobHazardAnalysisPreventativeMeasure', back_populates='hazard', uselist=False)
+    preventative_measures = db.relationship('JobHazardAnalysisPreventativeMeasure', order_by=JobHazardAnalysisPreventativeMeasure.id, back_populates='hazard')
+    
+    def validation_completion(self):
+        if (len(self.consequences) >= 1 
+            and all(consequence.validate_completion() for consequence in self.consequences) 
+            and len(self.preventative_measures) >= 1
+            and all(preventative_measure.validate_completion() for preventative_measure in self.preventative_measures)
+        ):
+            return True
+        return False
+            
 
 class JobHazardAnalysisTask(db.Model):
     # One to many with JHA
@@ -63,14 +62,25 @@ class JobHazardAnalysisTask(db.Model):
                 job_hazard_analysis_id=self.job_hazard_analysis_id
             ).scalar()
             self.step = (max_step or 1) + 1
+            
+    def validate_completion(self):
+        if len(self.hazards) >= 1 and all(hazard.validate_completion() for hazard in self.hazards):
+            return True
+        return False
 
 
 class JobHazardAnalysis(db.Model):
     __tablename__ = 'job_hazard_analysis'
+    
+    def validate_completion(self):
+        if all(task.validate_completion() for task in self.tasks):
+            self.status = StatusEnum.completed
+        else:
+            self.status = StatusEnum.draft
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(128), nullable=False)
     author = db.Column(db.String(50), nullable=False)
-    status = db.Column(StatusEnum, default=StatusEnum.draft, nullable=False)
+    status = db.Column(db.Enum(StatusEnum), default=StatusEnum.draft, nullable=False)
     
     tasks = db.relationship('JobHazardAnalysisTask', order_by=JobHazardAnalysisTask.id, back_populates='job_hazard_analysis')
