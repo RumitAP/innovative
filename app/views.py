@@ -1,7 +1,9 @@
-from flask import request, jsonify
+from flask import request, jsonify, make_response
 from flask.views import MethodView
+from sqlalchemy.exc import IntegrityError
 from app import db
 from app.models import JobHazardAnalysis
+from config import DEFAULT_PER_PAGE
 
 class CRUDView(MethodView):
 
@@ -46,3 +48,43 @@ class CRUDView(MethodView):
         db.session.delete(item)
         db.session.commit()
         return '', 204
+    
+    
+class JobHazardAnalysisCRUDView(CRUDView):
+    def get(self, id):
+        query_params = request.args
+
+        if id is None:
+            page = int(query_params.get('page', 1))
+            per_page = int(query_params.get('per_page', DEFAULT_PER_PAGE))
+            paginated_items = self.model.query.order_by(self.model.created_utc.desc()).paginate(page=page, per_page=per_page, error_out=False)
+            items = paginated_items.items
+            total_pages = paginated_items.pages
+            current_page = paginated_items.page
+
+            response = {
+                'total_pages': total_pages,
+                'current_page': current_page,
+                'items': self.schema(many=True).dump(items),
+            }
+            return jsonify(response)
+        else:
+            # Return a single item
+            item = self.model.query.get_or_404(id)
+            return jsonify(self.schema().dump(item))
+        
+    def post(self):
+        # Create a new record
+        data = request.json
+        item = self.model(**data)
+        if type(item) is JobHazardAnalysis:
+            item.validate_completion()
+        try:
+            db.session.add(item)
+            db.session.commit()
+        except IntegrityError as e:
+            db.session.rollback()
+            # Instead of raising ValidationError, create a response with status code 400
+            error_message = f"JHA with Title '{data.get('title')}' has already been created."
+            return make_response(jsonify({"error": error_message}), 400)
+        return jsonify(self.schema().dump(item))

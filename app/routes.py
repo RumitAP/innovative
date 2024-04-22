@@ -2,10 +2,10 @@ from flask import render_template
 from app import app
 from app.models import *
 from app.schemas import *
-from app.views import CRUDView
+from app.views import CRUDView, JobHazardAnalysisCRUDView
 
 # Register the generic CRUD endpoints for JobHazardAnalysis
-jha_view = CRUDView.as_view('jha_view', model=JobHazardAnalysis, schema=JobHazardAnalysisSchema)
+jha_view = JobHazardAnalysisCRUDView.as_view('jha_view', model=JobHazardAnalysis, schema=JobHazardAnalysisSchema)
 app.add_url_rule('/job-hazard-analysis/', defaults={'id': None}, view_func=jha_view, methods=['GET',])
 app.add_url_rule('/job-hazard-analysis/', view_func=jha_view, methods=['POST',])
 app.add_url_rule('/job-hazard-analysis/<int:id>', view_func=jha_view, methods=['GET', 'PUT', 'DELETE'])

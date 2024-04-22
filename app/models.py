@@ -1,11 +1,12 @@
 from app import db
 from enum import Enum
+import datetime
 from app.mixins import HazardMixin
 
 
 class StatusEnum(Enum):
-    draft = "Draft"
-    completed = "Completed"
+    Draft = "Draft"
+    Completed = "Completed"
 
 class JobHazardAnalysisPreventativeMeasure(HazardMixin, db.Model):
     __tablename__ = 'job_hazard_analysis_task_hazard_preventative_measure'
@@ -22,6 +23,8 @@ class JobHazardAnalysisTaskHazard(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     job_harazrd_analysis_task_id = db.Column(db.Integer, db.ForeignKey('job_hazard_analysis_task.id'), nullable=False, index=True)
     description = db.Column(db.String, default="" ,nullable=False)
+    created_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc))
+    updated_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc), onupdate=datetime.datetime.now(datetime.timezone.utc))
     
     task = db.relationship('JobHazardAnalysisTask', back_populates='hazards')
     consequences = db.relationship('JobHazardAnalysisTaskConsequences', order_by=JobHazardAnalysisTaskConsequences.id, back_populates='hazard')
@@ -45,6 +48,8 @@ class JobHazardAnalysisTask(db.Model):
     job_hazard_analysis_id = db.Column(db.Integer, db.ForeignKey('job_hazard_analysis.id'), nullable=False, index=True)
     task_description = db.Column(db.String, nullable=False)
     step = db.Column(db.Integer, nullable=False)
+    created_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc))
+    updated_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc), onupdate=datetime.datetime.now(datetime.timezone.utc))
     
     job_hazard_analysis = db.relationship('JobHazardAnalysis', back_populates='tasks')
     hazards = db.relationship('JobHazardAnalysisTaskHazard', order_by=JobHazardAnalysisTaskHazard.id, back_populates='task')
@@ -73,14 +78,16 @@ class JobHazardAnalysis(db.Model):
     __tablename__ = 'job_hazard_analysis'
     
     def validate_completion(self):
-        if all(task.validate_completion() for task in self.tasks):
-            self.status = StatusEnum.completed
+        if len(self.tasks) >= 1 and all(task.validate_completion() for task in self.tasks):
+            self.status = StatusEnum.Completed
         else:
-            self.status = StatusEnum.draft
+            self.status = StatusEnum.Draft
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.String(128), nullable=False)
+    title = db.Column(db.String(128), nullable=False, unique=True)
     author = db.Column(db.String(50), nullable=False)
-    status = db.Column(db.Enum(StatusEnum), default=StatusEnum.draft, nullable=False)
+    status = db.Column(db.Enum(StatusEnum), default=StatusEnum.Draft, nullable=False)
+    created_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc))
+    updated_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc), onupdate=datetime.datetime.now(datetime.timezone.utc))
     
     tasks = db.relationship('JobHazardAnalysisTask', order_by=JobHazardAnalysisTask.id, back_populates='job_hazard_analysis')

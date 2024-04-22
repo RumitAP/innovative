@@ -2,9 +2,14 @@
 <html>
 <head>
     <title>{% block title %}My Flask App{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bulma.min.css') }}">
 </head>
 <body>
+    <header class="header">
+        <div class="container">
+            <h1 class="title is-1">Acme Widgets, Inc.</h1>
+        </div>
+    </header>
     {% block content %}
     {% endblock %}
 </body>

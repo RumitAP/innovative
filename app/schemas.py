@@ -1,7 +1,11 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from marshmallow_enum import EnumField
 from app.models import *
 
 class JobHazardAnalysisSchema(SQLAlchemyAutoSchema):
+    
+    status = EnumField(StatusEnum, by_value=True)
+    
     class Meta:
         model = JobHazardAnalysis
         include_relationships = True
