@@ -2,7 +2,6 @@ let currentPage = 1;
 let jsonData;
 
 function fetchJHA(page = 1) {
-    // Correct the query parameter for page number
     fetch(`${apiUrlJHA}?page=${page}`)
         .then(response => response.json())
         .then(data => {
@@ -10,7 +9,6 @@ function fetchJHA(page = 1) {
             const totalPages = data.total_pages;
             const tableBody = document.getElementById('jha-table-body');
 
-            // Render items to table
             tableBody.innerHTML = data.items.map(item => `
                 <tr>
                     <td>${item.created_utc}</td>
@@ -18,13 +16,87 @@ function fetchJHA(page = 1) {
                     <td>${item.author}</td>
                     <td>${item.updated_utc}</td>
                     <td>${item.status}</td>
+                    <td>
+                        <i class="fas fa-eye" onclick="viewJHA(${JSON.stringify(item)})"></i>
+                        <i class="fas fa-trash" onclick="deleteJHA(${item.id})"></i> <!-- Add this line -->
+                    </td>
                 </tr>
             `).join('');
 
-            // Update pagination
             updatePagination(totalPages);
         })
         .catch(error => console.error('Error fetching data:', error));
+}
+
+function viewJHA(jha) {
+    document.getElementById('modal-title').innerHTML = '<strong>Title:</strong> ' + jha.title;
+    document.getElementById('modal-author').innerHTML = '<strong>Author:</strong> ' + jha.author;
+
+    const tasksContainer = document.getElementById('modal-tasks');
+    tasksContainer.innerHTML = ''; // Clear previous tasks
+
+    jha.tasks.forEach((task, index) => {
+        let taskNumber = index + 1;
+        let taskEl = document.createElement('p');
+        taskEl.innerHTML = `<strong>Task ${taskNumber}</strong>: ${task.task_description}`;
+        tasksContainer.appendChild(taskEl);
+
+        task.hazards.forEach(hazard => {
+            let hazardEl = document.createElement('p');
+            hazardEl.innerHTML = `&nbsp;• Hazard: ${hazard.description}`;
+            tasksContainer.appendChild(hazardEl);
+
+            let pmEl = document.createElement('p');
+            pmEl.innerHTML = `&nbsp;&nbsp;&nbsp;• Preventative Measures: ${hazard.preventative_measures.map(pm => pm.description).join(', ')}`;
+            tasksContainer.appendChild(pmEl);
+
+            let consEl = document.createElement('p');
+            consEl.innerHTML = `&nbsp;&nbsp;&nbsp;• Consequences: ${hazard.consequences.map(con => con.description).join(', ')}`;
+            tasksContainer.appendChild(consEl);
+        });
+    });
+
+    document.getElementById('jha-detail-modal').classList.add('is-active');
+}
+
+function deleteJHA(jhaId) {
+    if (!confirm('Are you sure you want to delete this JHA?')) {
+        return;
+    }
+
+    fetch(`${apiUrlJHA}/${jhaId}`, {
+        method: 'DELETE',
+        headers: {
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error deleting JHA');
+        }
+        if (response.status === 204) {
+            alert('JHA deleted successfully');
+            fetchJHA(currentPage);
+        } else {
+            return response.json();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('There was a problem deleting the JHA.');
+    });
+}
+
+function formatArrayOrObject(data) {
+    if (Array.isArray(data)) {
+        return data.join(', ');
+    } else if (data && typeof data === 'object') {
+        return data.name || data.description || JSON.stringify(data);
+    }
+    return 'N/A';
+}
+
+function closeJHAModal() {
+    document.getElementById('jha-detail-modal').classList.remove('is-active');
 }
 
 function addTask() {
@@ -36,13 +108,11 @@ function addTask() {
         return;
     }
 
-    // Construct the task data
     const taskData = {
         task_description: taskDescription,
         jha_id: jsonData.jha_id
     };
 
-    // Call the API to add the task
     fetch(apiUrlTasks, {
         method: 'POST',
         body: JSON.stringify(taskData),
@@ -52,10 +122,8 @@ function addTask() {
     })
     .then(response => response.json())
     .then(data => {
-        // Here you should have the task object returned by the API, including its ID
         const taskId = data.id;
 
-        // Now you can create the task element with the stored ID
         const taskList = document.getElementById('tasks-container');
         const taskElement = document.createElement('div');
         taskElement.classList.add('task-item');
@@ -67,10 +135,8 @@ function addTask() {
         `;
         taskList.appendChild(taskElement);
         
-        // Clear the input
         taskDescriptionInput.value = '';
         
-        // Optionally, show the submit button or enable it if necessary
         const submitButton = document.getElementById('submit-tasks');
         if (submitButton) {
             submitButton.classList.remove('is-hidden');
@@ -108,20 +174,9 @@ function addHazard(button, taskId) {
         submitHazard(this, taskId);
     });
     hazardsContainer.appendChild(hazardElement);
-
-    // const addConsequenceButton = hazardElement.querySelector('.add-consequence-button');
-    // addConsequenceButton.addEventListener('click', function() {
-    //     addConsequence(hazardElement, null);
-    // });
-
-    // const addPreventativeMeasureButton = hazardElement.querySelector('.add-preventative-measure-button');
-    // addPreventativeMeasureButton.addEventListener('click', function() {
-    //     addPreventativeMeasure(this);
-    // });
 }
 
 function addConsequence(hazardElement, hazardId) {
-    // Create a container for the consequence input and button
     const consequenceElement = document.createElement('div');
     consequenceElement.classList.add('consequence-item');
     
@@ -206,26 +261,64 @@ function toggleModal() {
 const finishButton = document.getElementById('your-finish-button-id');
 finishButton.textContent = 'Finish'; // Change the button text to 'Finish'
 finishButton.addEventListener('click', function() {
-    toggleModal();
-    fetchJHA();
-    // Here you can also add any other actions you need to perform when finishing
-});
-// Event listener for the 'Add New JHA' button
-document.getElementById('show-modal').addEventListener('click', toggleModal);
+    document.getElementById('new-jha-form').reset();
+    
+    // Clear the tasks and dynamically added elements within 'jha-tasks-form'
+    const tasksContainer = document.getElementById('tasks-container');
+    tasksContainer.innerHTML = ''; // This removes all tasks
 
-// Function to submit the new JHA data
+    jsonData = {};
+
+    // Hide the tasks form and show the initial JHA form
+    const newJhaForm = document.getElementById('new-jha-form');
+    const jhaTasksForm = document.getElementById('jha-tasks-form');
+    newJhaForm.classList.remove('is-hidden');
+    jhaTasksForm.classList.add('is-hidden');
+    const submitButton = document.getElementById('submit-tasks');
+    if (submitButton) {
+        submitButton.classList.add('is-hidden');
+        submitButton.disabled = true;
+    }
+
+    // Hide the modal
+    toggleModal();
+    fetchJHA(currentPage); // Refresh the JHA list if needed
+});
+document.getElementById('show-modal').addEventListener('click', function() {
+    // Reset the form in case it was not reset properly
+    document.getElementById('new-jha-form').reset();
+
+    const tasksContainer = document.getElementById('tasks-container');
+    tasksContainer.innerHTML = ''; // This removes all tasks
+
+    jsonData = {};
+
+    const newJhaForm = document.getElementById('new-jha-form');
+    const jhaTasksForm = document.getElementById('jha-tasks-form');
+    newJhaForm.classList.remove('is-hidden');
+    jhaTasksForm.classList.add('is-hidden');
+
+    const submitButton = document.getElementById('submit-tasks');
+    if (submitButton) {
+        submitButton.classList.add('is-hidden');
+        submitButton.disabled = true;
+    }
+
+    // Hide the modal
+    toggleModal();
+    fetchJHA(currentPage);
+});
+
 function submitJHA() {
     const form = document.getElementById('new-jha-form');
     const formData = new FormData(form);
     jsonData = Object.fromEntries(formData.entries());
 
-    // Use apiUrl which is defined in your HTML template
     fetch(apiUrlJHA, {
         method: 'POST',
         body: JSON.stringify(jsonData),
         headers: {
             'Content-Type': 'application/json',
-            // Include CSRF token header if needed
         }
     })
     .then(response => {
@@ -235,7 +328,6 @@ function submitJHA() {
         return response.json();
     })
     .then(data => {
-        // If the submission is successful, hide the JHA form and show the tasks form
         form.classList.add('is-hidden');
         const tasksForm = document.getElementById('jha-tasks-form');
         tasksForm.classList.remove('is-hidden');
@@ -278,17 +370,14 @@ function submitTasks() {
         body: JSON.stringify(dataToSubmit),
         headers: {
             'Content-Type': 'application/json',
-            // Include CSRF token if needed for your setup
         }
     })
     .then(response => response.json())
     .then(data => {
         console.log('Tasks submitted successfully:', data);
-        // Handle the successful submission, e.g., closing the modal or showing a success message
     })
     .catch(error => {
         console.error('Error submitting tasks:', error);
-        // Handle errors here, such as showing an error message to the user
     });
 }
 
@@ -308,10 +397,9 @@ function submitHazard(button, taskId) {
         task_id: taskId
     };
 
-    const method = hazardId ? 'PUT' : 'POST'; // Use PUT to update and POST to create
+    const method = hazardId ? 'PUT' : 'POST';
     const endpoint = hazardId ? `${apiUrlHazard}/${hazardId}` : apiUrlHazard;
 
-    // Call the API to add or update the hazard
     fetch(endpoint, {
         method: method,
         body: JSON.stringify(hazardData),
@@ -323,22 +411,18 @@ function submitHazard(button, taskId) {
     .then(data => {
         hazardItem.dataset.hazardId = data.id;
     
-        // Update the button event handlers to reference the hazardId from the dataset at the time of click
         const addConsequenceButton = hazardItem.querySelector('.add-consequence-button');
         addConsequenceButton.disabled = false;
         addConsequenceButton.addEventListener('click', function() {
-            // Directly access the hazardId from the dataset here
             addConsequence(hazardItem, hazardItem.dataset.hazardId);
         });
     
         const addPreventativeMeasureButton = hazardItem.querySelector('.add-preventative-measure-button');
         addPreventativeMeasureButton.disabled = false;
         addPreventativeMeasureButton.addEventListener('click', function() {
-            // Directly access the hazardId from the dataset here
             addPreventativeMeasure(hazardItem, hazardItem.dataset.hazardId);
         });
     
-        // Update the button text now that the hazard has been saved
         button.textContent = 'Update Hazard';
     })
     .catch(error => {
@@ -428,7 +512,6 @@ function displayErrorMessage(message) {
     errorMessageDiv.textContent = message; // Set the error message text
     errorMessageDiv.classList.remove('is-hidden'); // Show the error message
 
-    // Hide the error message after 10 seconds
     setTimeout(() => {
         errorMessageDiv.classList.add('is-hidden');
     }, 10000); // 10000 milliseconds = 10 seconds

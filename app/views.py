@@ -87,6 +87,13 @@ class JobHazardAnalysisCRUDView(CRUDView):
                 return make_response(jsonify({"error": error_message}), 400)
         return jsonify(self.schema().dump(item))
     
+    def delete(self, id):
+        # Delete a record
+        item = self.model.query.get_or_404(id)
+        db.session.delete(item)
+        db.session.commit()
+        return '', 204
+    
 class JobHazardAnalysisTasksCRUDView(CRUDView):
     def post(self):
         # Create a new record
@@ -104,6 +111,15 @@ class JobHazardAnalysisTasksCRUDView(CRUDView):
         item.job_hazard_analysis.validate_completion()
         return jsonify(self.schema().dump(item))
     
+    def delete(self):
+        # Delete a record
+        item = self.model.query.get_or_404(id)
+        jha = item.job_hazard_analysis
+        db.session.delete(item)
+        db.session.commit()
+        jha.validate_completion()
+        return '', 204
+    
 class JobHazardAnalysisTasksHazardsCRUDView(CRUDView):
     def post(self):
         data = request.json
@@ -120,6 +136,15 @@ class JobHazardAnalysisTasksHazardsCRUDView(CRUDView):
         item.task.job_hazard_analysis.validate_completion()
         return jsonify(self.schema().dump(item))
     
+    def delete(self):
+        # Delete a record
+        item = self.model.query.get_or_404(id)
+        task = item.task
+        db.session.delete(item)
+        db.session.commit()
+        task.job_hazard_analysis.validate_completion()
+        return '', 204
+    
 class JobHazardAnalysisTasksConsequencesAndPreventativeMeasuresCRUDView(CRUDView):
     def post(self):
         data = request.json
@@ -135,4 +160,14 @@ class JobHazardAnalysisTasksConsequencesAndPreventativeMeasuresCRUDView(CRUDView
             return make_response(jsonify({"error": error_message}), 400)
         item.hazard.task.job_hazard_analysis.validate_completion()
         return jsonify(self.schema().dump(item))
-        
+    
+    def delete(self):
+        def delete(self, id):
+            # Delete a record
+            item = self.model.query.get_or_404(id)
+            hazard = item.hazard
+            db.session.delete(item)
+            db.session.commit()
+            hazard.task.job_hazard_analysis.validate_completion()
+            return '', 204
+            

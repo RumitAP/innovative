@@ -1,4 +1,5 @@
 from app import db
+from sqlalchemy.orm import backref
 from enum import Enum
 import datetime
 from app.mixins import HazardMixin
@@ -43,8 +44,14 @@ class JobHazardAnalysisTaskHazard(db.Model):
     updated_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc), onupdate=datetime.datetime.now(datetime.timezone.utc))
     
     task = db.relationship('JobHazardAnalysisTask', back_populates='hazards')
-    consequences = db.relationship('JobHazardAnalysisTaskConsequences', order_by=JobHazardAnalysisTaskConsequences.id, back_populates='hazard')
-    preventative_measures = db.relationship('JobHazardAnalysisPreventativeMeasure', order_by=JobHazardAnalysisPreventativeMeasure.id, back_populates='hazard')
+    preventative_measures = db.relationship(
+        'JobHazardAnalysisPreventativeMeasure',
+        cascade="all, delete, delete-orphan"
+    )
+    consequences = db.relationship(
+        'JobHazardAnalysisTaskConsequences',
+        cascade="all, delete, delete-orphan"
+    )
     
     def validate_completion(self):
         if (len(self.consequences) >= 1 
@@ -66,8 +73,15 @@ class JobHazardAnalysisTask(db.Model):
     created_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc))
     updated_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc), onupdate=datetime.datetime.now(datetime.timezone.utc))
     
-    job_hazard_analysis = db.relationship('JobHazardAnalysis', back_populates='tasks')
-    hazards = db.relationship('JobHazardAnalysisTaskHazard', order_by=JobHazardAnalysisTaskHazard.id, back_populates='task')
+    job_hazard_analysis = db.relationship(
+        'JobHazardAnalysis',
+        back_populates='tasks'
+    )
+    hazards = db.relationship(
+        'JobHazardAnalysisTaskHazard',
+        cascade="all, delete, delete-orphan",
+        back_populates='task'
+    )
             
     def validate_completion(self):
         if len(self.hazards) >= 1 and all(hazard.validate_completion() for hazard in self.hazards):
@@ -93,4 +107,9 @@ class JobHazardAnalysis(db.Model):
     created_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc))
     updated_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc), onupdate=datetime.datetime.now(datetime.timezone.utc))
     
-    tasks = db.relationship('JobHazardAnalysisTask', order_by=JobHazardAnalysisTask.id, back_populates='job_hazard_analysis')
+    tasks = db.relationship(
+        'JobHazardAnalysisTask',
+        cascade="all, delete, delete-orphan",
+        back_populates='job_hazard_analysis',
+        order_by='JobHazardAnalysisTask.id'
+    )

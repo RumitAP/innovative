@@ -33,6 +33,24 @@
     </div>
 </section>
 
+<div class="modal" id="jha-detail-modal">
+    <div class="modal-background" onclick="closeJHAModal()"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Job Hazard Analysis Details</p>
+            <button class="delete" aria-label="close" onclick="closeJHAModal()"></button>
+        </header>
+        <section class="modal-card-body">
+            <h2 id="modal-title">Title: <span></span></h2>
+            <p><span id="modal-author"></span></p>
+            <div id="modal-tasks">
+            </div>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button" onclick="closeJHAModal()">Close</button>
+        </footer>
+    </div>
+</div>
 
 <div class="modal" id="new-jha-modal">
     <div class="modal-background" onclick="toggleModal()"></div>
