@@ -1,0 +1,27 @@
+/* Style for the hazard items */
+.hazard-item {
+    margin-bottom: 1em; /* Adjust as needed for spacing */
+    border: 1px solid #0c0b0b; /* Optional: adds a border around each hazard item */
+    padding: 1em; /* Spacing inside the hazard item */
+    border-radius: 4px; /* Optional: rounds the corners */
+    background-color: #342f2f58; /* Optional: a light background for each hazard */
+}
+
+/* Style for smaller buttons */
+.button.is-primary {
+    font-size: 0.8em; /* Smaller text */
+    padding: 0.5em 1em; /* Smaller padding */
+    margin: 0.5em 0; /* Spacing between buttons and other elements */
+}
+
+/* Style for the inputs, adjust to match button sizes if desired */
+.input.hazard-input {
+    padding: 0.5em; /* Less padding to make input smaller */
+    margin-bottom: 0.5em; /* Spacing after input */
+}
+
+/* You may also want to adjust the label sizes if needed */
+.label {
+    display: block; /* Ensures the label takes up its own line */
+    margin-bottom: 0.2em; /* Spacing before the corresponding input/button */
+}

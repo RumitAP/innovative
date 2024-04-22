@@ -33,7 +33,7 @@
     </div>
 </section>
 
-<!-- Modal Structure -->
+
 <div class="modal" id="new-jha-modal">
     <div class="modal-background" onclick="toggleModal()"></div>
     <div id="error-message" class="notification is-danger is-hidden">
@@ -59,19 +59,43 @@
                         <input class="input" type="text" placeholder="Author Name" name="author" required>
                     </div>
                 </div>
-                <!-- Status is hidden and defaulted to 'Draft' -->
                 <input type="hidden" name="status" value="Draft">
+                <button type="button" class="button is-success" onclick="submitJHA()">Next</button>
+                <button class="button" onclick="toggleModal()">Cancel</button>
             </form>
+            <!-- Form for JHA Tasks -->
+            <form id="jha-tasks-form" class="is-hidden">
+                <div id="tasks-container">
+                </div>
+                <div class="field">
+                    <label class="label">Task Description</label>
+                    <div class="control">
+                        <input class="input" type="text" id="task_description_input" placeholder="Task Description" required>
+                    </div>
+                </div>
+                <button type="button" class="button is-link" onclick="addTask()">Add Task</button>
+                <button type="button" id="your-finish-button-id" class="button is-link">Finish</button>
+            </form>                  
         </section>
         <footer class="modal-card-foot">
-            <button class="button is-success" onclick="submitJHA()">Create</button>
-            <button class="button" onclick="toggleModal()">Cancel</button>
         </footer>
     </div>
 </div>
 
 <script type="text/javascript">
-    var apiUrl = "{{ url_for('jha_view', _external=True) }}";
+    var apiUrlJHA = "{{ url_for('jha_view', _external=True) }}";
+</script>
+<script type="text/javascript">
+    var apiUrlTasks = "{{ url_for('jhat_view', _external=True) }}";
+</script>
+<script type="text/javascript">
+    var apiUrlHazard = "{{ url_for('jhath_view', _external=True) }}";
+</script>
+<script type="text/javascript">
+    var apiUrlConsequences = "{{ url_for('jhatc_view', _external=True) }}";
+</script>
+<script type="text/javascript">
+    var apiUrlPMs = "{{ url_for('jhatpm_view', _external=True) }}";
 </script>
 <script src="{{ url_for('static', filename='js/jha.js') }}"></script>
 

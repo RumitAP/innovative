@@ -11,10 +11,26 @@ class StatusEnum(Enum):
 class JobHazardAnalysisPreventativeMeasure(HazardMixin, db.Model):
     __tablename__ = 'job_hazard_analysis_task_hazard_preventative_measure'
     hazard = db.relationship('JobHazardAnalysisTaskHazard', back_populates='preventative_measures')
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    job_hazard_analysis_task_hazard_id = db.Column(db.Integer, db.ForeignKey('job_hazard_analysis_task_hazard.id'), nullable=False, index=True)
+    description = db.Column(db.String, default="", nullable=False)
+    created_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc))
+    updated_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc), onupdate=datetime.datetime.now(datetime.timezone.utc))
+    
+    def validate_completion(self):
+        return bool(self.description)
 
 class JobHazardAnalysisTaskConsequences(HazardMixin, db.Model):
     __tablename__ = 'job_hazard_analysis_task_consequence'
     hazard = db.relationship('JobHazardAnalysisTaskHazard', back_populates='consequences')
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    job_hazard_analysis_task_hazard_id = db.Column(db.Integer, db.ForeignKey('job_hazard_analysis_task_hazard.id'), nullable=False, index=True)
+    description = db.Column(db.String, default="", nullable=False)
+    created_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc))
+    updated_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc), onupdate=datetime.datetime.now(datetime.timezone.utc))
+    
+    def validate_completion(self):
+        return bool(self.description)
 
 class JobHazardAnalysisTaskHazard(db.Model):
     # Many to one with Task
@@ -30,7 +46,7 @@ class JobHazardAnalysisTaskHazard(db.Model):
     consequences = db.relationship('JobHazardAnalysisTaskConsequences', order_by=JobHazardAnalysisTaskConsequences.id, back_populates='hazard')
     preventative_measures = db.relationship('JobHazardAnalysisPreventativeMeasure', order_by=JobHazardAnalysisPreventativeMeasure.id, back_populates='hazard')
     
-    def validation_completion(self):
+    def validate_completion(self):
         if (len(self.consequences) >= 1 
             and all(consequence.validate_completion() for consequence in self.consequences) 
             and len(self.preventative_measures) >= 1
@@ -47,26 +63,11 @@ class JobHazardAnalysisTask(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     job_hazard_analysis_id = db.Column(db.Integer, db.ForeignKey('job_hazard_analysis.id'), nullable=False, index=True)
     task_description = db.Column(db.String, nullable=False)
-    step = db.Column(db.Integer, nullable=False)
     created_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc))
     updated_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc), onupdate=datetime.datetime.now(datetime.timezone.utc))
     
     job_hazard_analysis = db.relationship('JobHazardAnalysis', back_populates='tasks')
     hazards = db.relationship('JobHazardAnalysisTaskHazard', order_by=JobHazardAnalysisTaskHazard.id, back_populates='task')
-    
-    
-    def __init__(self, **kwargs):
-        super(JobHazardAnalysisTask, self).__init__(**kwargs)
-        self.set_step()
-
-    def set_step(self):
-        # Added step because a JHA has a "series" of steps. Assuming they are completed in order.
-        # Find the current max step for the associated JobHazardAnalysis
-        if self.job_hazard_analysis_id:
-            max_step = db.session.query(db.func.max(JobHazardAnalysisTask.step)).filter_by(
-                job_hazard_analysis_id=self.job_hazard_analysis_id
-            ).scalar()
-            self.step = (max_step or 1) + 1
             
     def validate_completion(self):
         if len(self.hazards) >= 1 and all(hazard.validate_completion() for hazard in self.hazards):
@@ -82,6 +83,8 @@ class JobHazardAnalysis(db.Model):
             self.status = StatusEnum.Completed
         else:
             self.status = StatusEnum.Draft
+        db.session.add(self)
+        db.session.commit()
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(128), nullable=False, unique=True)

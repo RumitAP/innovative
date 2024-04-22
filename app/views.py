@@ -78,13 +78,61 @@ class JobHazardAnalysisCRUDView(CRUDView):
         data = request.json
         item = self.model(**data)
         if type(item) is JobHazardAnalysis:
-            item.validate_completion()
+            try:
+                item.validate_completion()
+            except IntegrityError as e:
+                db.session.rollback()
+                # Instead of raising ValidationError, create a response with status code 400
+                error_message = f"JHA with Title '{data.get('title')}' has already been created."
+                return make_response(jsonify({"error": error_message}), 400)
+        return jsonify(self.schema().dump(item))
+    
+class JobHazardAnalysisTasksCRUDView(CRUDView):
+    def post(self):
+        # Create a new record
+        data = request.json
+        jha_id = data.pop("jha_id")
+        data["job_hazard_analysis_id"] = jha_id
+        item = self.model(**data)
         try:
             db.session.add(item)
             db.session.commit()
         except IntegrityError as e:
             db.session.rollback()
-            # Instead of raising ValidationError, create a response with status code 400
-            error_message = f"JHA with Title '{data.get('title')}' has already been created."
+            error_message = "Error."
             return make_response(jsonify({"error": error_message}), 400)
+        item.job_hazard_analysis.validate_completion()
         return jsonify(self.schema().dump(item))
+    
+class JobHazardAnalysisTasksHazardsCRUDView(CRUDView):
+    def post(self):
+        data = request.json
+        jha_id = data.pop("task_id")
+        data["job_harazrd_analysis_task_id"] = jha_id
+        item = self.model(**data)
+        try:
+            db.session.add(item)
+            db.session.commit()
+        except IntegrityError as e:
+            db.session.rollback()
+            error_message = "Error."
+            return make_response(jsonify({"error": error_message}), 400)
+        item.task.job_hazard_analysis.validate_completion()
+        return jsonify(self.schema().dump(item))
+    
+class JobHazardAnalysisTasksConsequencesAndPreventativeMeasuresCRUDView(CRUDView):
+    def post(self):
+        data = request.json
+        jha_id = data.pop("job_hazard_analysis_task_hazard_id")
+        data["job_hazard_analysis_task_hazard_id"] = jha_id
+        item = self.model(**data)
+        try:
+            db.session.add(item)
+            db.session.commit()
+        except IntegrityError as e:
+            db.session.rollback()
+            error_message = "Error."
+            return make_response(jsonify({"error": error_message}), 400)
+        item.hazard.task.job_hazard_analysis.validate_completion()
+        return jsonify(self.schema().dump(item))
+        
