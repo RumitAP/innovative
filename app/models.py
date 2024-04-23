@@ -9,7 +9,7 @@ class StatusEnum(Enum):
     Draft = "Draft"
     Completed = "Completed"
 
-class JobHazardAnalysisPreventativeMeasure(HazardMixin, db.Model):
+class JobHazardAnalysisPreventativeMeasure( db.Model):
     # Many to one with Hazards
     __tablename__ = 'job_hazard_analysis_task_hazard_preventative_measure'
     hazard = db.relationship('JobHazardAnalysisTaskHazard', back_populates='preventative_measures')
@@ -22,7 +22,7 @@ class JobHazardAnalysisPreventativeMeasure(HazardMixin, db.Model):
     def validate_completion(self):
         return bool(self.description)
 
-class JobHazardAnalysisTaskConsequences(HazardMixin, db.Model):
+class JobHazardAnalysisTaskConsequences( db.Model):
     # Many to one with Hazards
     __tablename__ = 'job_hazard_analysis_task_consequence'
     hazard = db.relationship('JobHazardAnalysisTaskHazard', back_populates='consequences')
