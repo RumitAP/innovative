@@ -1,6 +1,8 @@
 # innovative
 Innovative Refrigeration Systems Challenge
 
+### Please keep in mind that I chose to use Flask to show my ability to learn a new framework. 
+
 `Running on python 3.10`
 
 # Set up
@@ -51,7 +53,7 @@ and they are ordered (hence why it has the field "step"). The third bullet point
 
 * Why did I choose to add the concept of a `status`?
 
-I wanted to keep extensibility in mind when building out this application. If we wanted to add administrative steps in order to approve a JHA, we could and have each step correspond to a specific status (`Draft`, `Submitted`, `Completed`, `Under Review`)
+I wanted to keep extensibility in mind when building out this application. If we wanted to add administrative steps in order to approve a JHA, we could and have each step correspond to a specific status (`Draft`, `Submitted`, `Completed`, `Under Review`).
 
 * Why did I choose to implement pagination?
 
