@@ -2,7 +2,6 @@ from app import db
 from sqlalchemy.orm import backref
 from enum import Enum
 import datetime
-from app.mixins import HazardMixin
 
 
 class StatusEnum(Enum):
