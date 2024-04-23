@@ -57,6 +57,30 @@ It improves both readability and performance.
 It's just an example that I put in there so that it can work for everyone.
 
 
-![alt text](image.png)
+# Home Page
 
 ![alt text](image-1.png)
+
+# Add JHA Page 1
+
+![alt text](image-2.png)
+
+# Add JHA Page 2
+![alt text](image.png)
+
+
+# Eye Icon 
+
+![alt text](image-3.png)
+
+
+# Trashcan Icon
+
+`Deletes item`
+
+# Pencil Icon on Homescreen
+
+Can update the JHA title and author.
+
+![alt text](image-4.png)
+
