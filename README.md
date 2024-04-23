@@ -7,7 +7,9 @@ Innovative Refrigeration Systems Challenge
 
 `Running on python 3.10`
 
-## Set up with Docker
+## Set up with Docker -- PORT 8001
+
+`Note: this application is exposed on PORT 8001`
 
 First create an empty postgres database.
 
@@ -24,6 +26,8 @@ POSTGRES_DB=innovative
 Next download `docker-compose`.
 
 Run `sudo docker-compose up -d --build` to get started. If you run into issues with images not being found, please run `docker pull <image>`.
+
+The application will be exposed on port `8001`.
 
 
 ## Set up without Docker
