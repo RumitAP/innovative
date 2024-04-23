@@ -49,7 +49,7 @@ A JHA involves doing the following:
 The first bullet points tells me that the parent model will be the Job Hazard Analysis model. The second bullet point tells me that tasks are children of JHA's 
 and they are ordered (hence why it has the field "step"). The third bullet point tells me that each task has hazards and consequences associated with it. However, it made most sense to me to structure my form such that each hazard had a consequence. It made more sense to me that each hazard has a potential consequence -- whether it's a business consequence or personal injury consequence. Each hazard should be able to have more than one consequence. The last bullet point tells us that preventative measures are tied to each hazard and each hazard can have many preventative measures. 
 
-* Why did I chose to add the concept of a `status`?
+* Why did I choose to add the concept of a `status`?
 
 I wanted to keep extensibility in mind when building out this application. If we wanted to add administrative steps in order to approve a JHA, we could and have each step correspond to a specific status (`Draft`, `Submitted`, `Completed`, `Under Review`)
 
