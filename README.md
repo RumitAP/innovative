@@ -1,6 +1,8 @@
 # innovative
 Innovative Refrigeration Systems Challenge
 
+`Running on python 3.10`
+
 
 Remember to set :
 

@@ -10,6 +10,7 @@ class StatusEnum(Enum):
     Completed = "Completed"
 
 class JobHazardAnalysisPreventativeMeasure(HazardMixin, db.Model):
+    # Many to one with Hazards
     __tablename__ = 'job_hazard_analysis_task_hazard_preventative_measure'
     hazard = db.relationship('JobHazardAnalysisTaskHazard', back_populates='preventative_measures')
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -22,6 +23,7 @@ class JobHazardAnalysisPreventativeMeasure(HazardMixin, db.Model):
         return bool(self.description)
 
 class JobHazardAnalysisTaskConsequences(HazardMixin, db.Model):
+    # Many to one with Hazards
     __tablename__ = 'job_hazard_analysis_task_consequence'
     hazard = db.relationship('JobHazardAnalysisTaskHazard', back_populates='consequences')
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

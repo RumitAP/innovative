@@ -90,7 +90,6 @@ function populateEditForm(jha, jhaId) {
     document.getElementById('edit-title').value = jha.title;
     document.getElementById('edit-author').value = jha.author;
     document.getElementById('edit-id').value = jhaId
-    // Populate other fields as necessary
 }
 
 function closeEditModal() {
@@ -123,7 +122,7 @@ function submitEditJHA() {
     .then(() => {
         alert('JHA updated successfully');
         toggleEditModal();
-        fetchJHA(currentPage); // Refresh the JHA list
+        fetchJHA(currentPage);
     })
     .catch(error => {
         console.error('Error:', error);
@@ -203,7 +202,7 @@ function addTask() {
         const taskList = document.getElementById('tasks-container');
         const taskElement = document.createElement('div');
         taskElement.classList.add('task-item');
-        taskElement.dataset.taskId = taskId; // Store the ID
+        taskElement.dataset.taskId = taskId;
         taskElement.innerHTML = `
             <span class="delete-task-button" onclick="deleteTask(this, ${taskId})">&#x1F5D1;</span>
             <div class="task-description">${taskDescription}</div>
@@ -620,12 +619,12 @@ function deleteTask(element, taskId) {
 
 function displayErrorMessage(message) {
     const errorMessageDiv = document.getElementById('error-message');
-    errorMessageDiv.textContent = message; // Set the error message text
-    errorMessageDiv.classList.remove('is-hidden'); // Show the error message
+    errorMessageDiv.textContent = message;
+    errorMessageDiv.classList.remove('is-hidden'); 
 
     setTimeout(() => {
         errorMessageDiv.classList.add('is-hidden');
-    }, 10000); // 10000 milliseconds = 10 seconds
+    }, 10000); 
 }
 
 document.addEventListener('DOMContentLoaded', function() {
