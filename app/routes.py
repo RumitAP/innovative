@@ -18,21 +18,21 @@ app.add_url_rule('/job-hazard-analysis-task/<int:id>', view_func=jhat_view, meth
 
 # Register the generic CRUD endpoints for JobHazardAnalysisTaskHazard
 jhath_view = JobHazardAnalysisTasksHazardsCRUDView.as_view('jhath_view', model=JobHazardAnalysisTaskHazard, schema=JobHazardAnalysisTaskHazardSchema)
-app.add_url_rule('/job-hazard-analysis-task-hazard/', defaults={'id': None}, view_func=jhath_view, methods=['GET',])
+#app.add_url_rule('/job-hazard-analysis-task-hazard/', defaults={'id': None}, view_func=jhath_view, methods=['GET',])
 app.add_url_rule('/job-hazard-analysis-task-hazard/', view_func=jhath_view, methods=['POST',])
 app.add_url_rule('/job-hazard-analysis-task-hazard/<int:id>', view_func=jhath_view, methods=['GET', 'PUT', 'DELETE'])
 
 # Register the generic CRUD endpoints for JobHazardAnalysisTaskConsequences
 jhatc_view = JobHazardAnalysisTasksConsequencesAndPreventativeMeasuresCRUDView.as_view('jhatc_view', model=JobHazardAnalysisTaskConsequences, schema=JobHazardAnalysisTaskConsequencesSchema)
-app.add_url_rule('/job-hazard-analysis-task-consequences/', defaults={'id': None}, view_func=jhatc_view, methods=['GET',])
+#app.add_url_rule('/job-hazard-analysis-task-consequences/', defaults={'id': None}, view_func=jhatc_view, methods=['GET',])
 app.add_url_rule('/job-hazard-analysis-task-consequences/', view_func=jhatc_view, methods=['POST',])
-app.add_url_rule('/job-hazard-analysis-task-consequences/<int:id>', view_func=jhatc_view, methods=['GET', 'PUT', 'DELETE'])
+app.add_url_rule('/job-hazard-analysis-task-consequences/<int:id>', view_func=jhatc_view, methods=['GET', 'PUT'])
 
 # Register the generic CRUD endpoints for JobHazardAnalysisPreventativeMeasure
 jhatpm_view = JobHazardAnalysisTasksConsequencesAndPreventativeMeasuresCRUDView.as_view('jhatpm_view', model=JobHazardAnalysisPreventativeMeasure, schema=JobHazardAnalysisPreventativeMeasureSchema)
-app.add_url_rule('/job-hazard-analysis-preventative-measure/', defaults={'id': None}, view_func=jhatpm_view, methods=['GET',])
+#app.add_url_rule('/job-hazard-analysis-preventative-measure/', defaults={'id': None}, view_func=jhatpm_view, methods=['GET',])
 app.add_url_rule('/job-hazard-analysis-preventative-measure/', view_func=jhatpm_view, methods=['POST',])
-app.add_url_rule('/job-hazard-analysis-preventative-measure/<int:id>', view_func=jhatpm_view, methods=['GET', 'PUT', 'DELETE'])
+app.add_url_rule('/job-hazard-analysis-preventative-measure/<int:id>', view_func=jhatpm_view, methods=['GET', 'PUT'])
 
 
 @app.route('/')
