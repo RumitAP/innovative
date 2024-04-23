@@ -6,3 +6,4 @@ psycopg2-binary==2.9.9
 alembic==1.13.1
 marshmallow-sqlalchemy==1.0.0
 marshmallow-enum==1.5.1
+python-dotenv==1.0.1

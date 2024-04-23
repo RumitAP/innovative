@@ -1,11 +1,32 @@
 # innovative
 Innovative Refrigeration Systems Challenge
 
-### Please keep in mind that I chose to use Flask to show my ability to learn a new framework. 
+## Please keep in mind that I chose to use Flask to show my ability to learn a new framework. 
+
+`Set up is possible in both Docker
 
 `Running on python 3.10`
 
-# Set up
+## Set up with Docker
+
+First create an empty postgres database.
+
+Create a `.env` file in the root of project:
+
+```
+DATABASE_URL=postgresql://rumit:password@db/innovative
+DATABASE_HOST=db
+POSTGRES_USER=rumit
+POSTGRES_PASSWORD=password
+POSTGRES_DB=innovative
+```
+
+Next download `docker-compose`.
+
+Run `sudo docker-compose up -d --build` to get started. If you run into issues with images not being found, please run `docker pull <image>`.
+
+
+## Set up without Docker
 
 First, create an empty postgres database and either `export DATABASE URL='postgresql://rumit:password@localhost/innovative'` or adjust the `config.py` file. 
 
@@ -26,7 +47,7 @@ $ python3 run.py
 ```
 
 
-# Explanations
+## Explanations
 
 * Why did I use Flask?
 
@@ -65,28 +86,28 @@ It improves both readability and performance.
 It's just an example that I put in there so that it can work for everyone.
 
 
-# Home Page
+## Home Page
 
 ![alt text](imgs/image-1.png)
 
-# Add JHA Page 1
+## Add JHA Page 1
 
 ![alt text](imgs/image-2.png)
 
-# Add JHA Page 2
+## Add JHA Page 2
 ![alt text](imgs/image.png)
 
 
-# Eye Icon 
+## Eye Icon 
 
 ![alt text](imgs/image-3.png)
 
 
-# Trashcan Icon
+## Trashcan Icon
 
 `Deletes item`
 
-# Pencil Icon on Homescreen
+## Pencil Icon on Homescreen
 
 Can update the JHA title and author.
 

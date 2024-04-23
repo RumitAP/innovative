@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    command: >
+      sh -c "flask db upgrade && python3 run.py"
+
+  db:
+    image: postgres:13
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
