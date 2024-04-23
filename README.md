@@ -1,8 +1,6 @@
 # innovative
 Innovative Refrigeration Systems Challenge
 
-## Please keep in mind that I chose to use Flask to show my ability to learn a new framework. 
-
 `Set up is possible in both Docker
 
 `Running on python 3.10`
@@ -15,7 +13,7 @@ First create an empty postgres database.
 
 Create a `.env` file in the root of project:
 
-```
+```python
 DATABASE_URL=postgresql://rumit:password@db/innovative
 DATABASE_HOST=db
 POSTGRES_USER=rumit
@@ -34,7 +32,9 @@ The application will be exposed on port `8001`.
 
 First, create an empty postgres database and either `export DATABASE URL='postgresql://rumit:password@localhost/innovative'` or adjust the `config.py` file. 
 
-```
+Then:
+
+```bash
 $ pip install virtualenv
 
 $ virtualenv venv
@@ -61,7 +61,7 @@ I wanted to show my ability to pick up new frameworks in a short period of time.
 
 The instructions from the Washington website said this:
 
-```
+```bash
 A JHA involves doing the following:
 
 1. Select the job/activity to be analyzed.
