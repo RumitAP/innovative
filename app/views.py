@@ -76,6 +76,9 @@ class JobHazardAnalysisCRUDView(CRUDView):
     def post(self):
         # Create a new record
         data = request.json
+        if data.get('title') == "" or data.get('author') == "":
+            error_message = f"Item must have both a title ({data.get('title') == '' or 'None'}) or author ({data.get('author') == '' or 'None'})"
+            return make_response(jsonify({"error": error_message}), 400)
         item = self.model(**data)
         if type(item) is JobHazardAnalysis:
             try:

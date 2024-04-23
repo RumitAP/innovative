@@ -17,7 +17,8 @@ function fetchJHA(page = 1) {
                     <td>${item.updated_utc}</td>
                     <td>${item.status}</td>
                     <td>
-                        <i class="fas fa-eye" onclick="viewJHA(${JSON.stringify(item)})"></i>
+                        <i class="fas fa-eye" onclick="viewJHA(${item.id})"></i>
+                        <i class="fas fa-edit" onclick="editJHA(${item.id})"></i>
                         <i class="fas fa-trash" onclick="deleteJHA(${item.id})"></i> <!-- Add this line -->
                     </td>
                 </tr>
@@ -28,35 +29,106 @@ function fetchJHA(page = 1) {
         .catch(error => console.error('Error fetching data:', error));
 }
 
-function viewJHA(jha) {
-    document.getElementById('modal-title').innerHTML = '<strong>Title:</strong> ' + jha.title;
-    document.getElementById('modal-author').innerHTML = '<strong>Author:</strong> ' + jha.author;
+function viewJHA(jhaId) {
 
-    const tasksContainer = document.getElementById('modal-tasks');
-    tasksContainer.innerHTML = ''; // Clear previous tasks
+    fetch(`${apiUrlJHA}/${jhaId}`)
+        .then(response => response.json())
+        .then(jha => {
+            document.getElementById('modal-title').innerHTML = '<strong>Title:</strong> ' + jha.title;
+            document.getElementById('modal-author').innerHTML = '<strong>Author:</strong> ' + jha.author;
 
-    jha.tasks.forEach((task, index) => {
-        let taskNumber = index + 1;
-        let taskEl = document.createElement('p');
-        taskEl.innerHTML = `<strong>Task ${taskNumber}</strong>: ${task.task_description}`;
-        tasksContainer.appendChild(taskEl);
+            const tasksContainer = document.getElementById('modal-tasks');
+            tasksContainer.innerHTML = ''; // Clear previous tasks
 
-        task.hazards.forEach(hazard => {
-            let hazardEl = document.createElement('p');
-            hazardEl.innerHTML = `&nbsp;• Hazard: ${hazard.description}`;
-            tasksContainer.appendChild(hazardEl);
+            jha.tasks.forEach((task, index) => {
+                let taskNumber = index + 1;
+                let taskEl = document.createElement('p');
+                taskEl.innerHTML = `<strong>Task ${taskNumber}</strong>: ${task.task_description}`;
+                tasksContainer.appendChild(taskEl);
 
-            let pmEl = document.createElement('p');
-            pmEl.innerHTML = `&nbsp;&nbsp;&nbsp;• Preventative Measures: ${hazard.preventative_measures.map(pm => pm.description).join(', ')}`;
-            tasksContainer.appendChild(pmEl);
+                task.hazards.forEach(hazard => {
+                    let hazardEl = document.createElement('p');
+                    hazardEl.innerHTML = `&nbsp;• Hazard: ${hazard.description}`;
+                    tasksContainer.appendChild(hazardEl);
 
-            let consEl = document.createElement('p');
-            consEl.innerHTML = `&nbsp;&nbsp;&nbsp;• Consequences: ${hazard.consequences.map(con => con.description).join(', ')}`;
-            tasksContainer.appendChild(consEl);
-        });
+                    let pmEl = document.createElement('p');
+                    pmEl.innerHTML = `&nbsp;&nbsp;&nbsp;• Preventative Measures: ${hazard.preventative_measures.map(pm => pm.description).join(', ')}`;
+                    tasksContainer.appendChild(pmEl);
+
+                    let consEl = document.createElement('p');
+                    consEl.innerHTML = `&nbsp;&nbsp;&nbsp;• Consequences: ${hazard.consequences.map(con => con.description).join(', ')}`;
+                    tasksContainer.appendChild(consEl);
+                });
+            });
+
+            document.getElementById('jha-detail-modal').classList.add('is-active');
+        })
+    .catch(error => {
+        console.error('Error fetching edit form:', error);
     });
+    
+}
 
-    document.getElementById('jha-detail-modal').classList.add('is-active');
+function editJHA(jhaId) {
+    fetch(`${apiUrlJHA}/${jhaId}`)
+        .then(response => response.json())
+        .then(data => {
+            toggleEditModal();
+            populateEditForm(data, jhaId)
+    })
+    .catch(error => {
+        console.error('Error fetching edit form:', error);
+    });
+}
+
+function toggleEditModal() {
+    const modal = document.getElementById('edit-jha-modal');
+    modal.classList.toggle('is-active');
+}
+
+function populateEditForm(jha, jhaId) {
+    document.getElementById('edit-title').value = jha.title;
+    document.getElementById('edit-author').value = jha.author;
+    document.getElementById('edit-id').value = jhaId
+    // Populate other fields as necessary
+}
+
+function closeEditModal() {
+    toggleEditModal();
+}
+
+function submitEditJHA() {
+    const title = document.getElementById('edit-title').value;
+    const author = document.getElementById('edit-author').value;
+    const id = document.getElementById('edit-id').value;
+
+    const jsonData = {
+        "title": title,
+        "author": author
+    };
+
+    fetch(`${apiUrlJHA}/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(jsonData),
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error saving JHA');
+        }
+        return response.json();
+    })
+    .then(() => {
+        alert('JHA updated successfully');
+        toggleEditModal();
+        fetchJHA(currentPage); // Refresh the JHA list
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('There was a problem saving the JHA details.');
+    });
 }
 
 function deleteJHA(jhaId) {
@@ -190,7 +262,7 @@ function addConsequence(hazardElement, hazardId) {
     // Add submit button for consequence
     const submitConsequenceButton = document.createElement('button');
     submitConsequenceButton.textContent = 'Submit Consequence';
-    submitConsequenceButton.classList.add('button', 'is-primary', 'submit-consequence-button', 'is-magenta');
+    submitConsequenceButton.classList.add('button', 'is-primary', 'submit-consequence-button');
     submitConsequenceButton.onclick = function() {
         submitConsequence(this, hazardId);
     };
@@ -216,7 +288,7 @@ function addPreventativeMeasure(hazardElement, hazardId) {
     // Add submit button for preventative measure
     const submitPreventativeMeasureButton = document.createElement('button');
     submitPreventativeMeasureButton.textContent = 'Submit Preventative Measure';
-    submitPreventativeMeasureButton.classList.add('button', 'is-primary', 'submit-preventative-measure-button', 'is-magenta');
+    submitPreventativeMeasureButton.classList.add('button', 'is-primary', 'submit-preventative-measure-button');
     submitPreventativeMeasureButton.onclick = function() {
         submitPreventativeMeasure(this, hazardId);
     };
@@ -258,7 +330,7 @@ function toggleModal() {
     var modal = document.getElementById('new-jha-modal');
     modal.classList.toggle('is-active');
 }
-const finishButton = document.getElementById('your-finish-button-id');
+const finishButton = document.getElementById('finish-button-id');
 finishButton.textContent = 'Finish'; // Change the button text to 'Finish'
 finishButton.addEventListener('click', function() {
     document.getElementById('new-jha-form').reset();
@@ -323,7 +395,7 @@ function submitJHA() {
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error("The title has already been used.");
+            throw new Error("Error, title must be unique and author must be provided.");
         }
         return response.json();
     })
@@ -444,7 +516,7 @@ function submitConsequence(button, hazardId) {
         return;
     }
 
-    const data = {
+    const data_m = {
         description: description,
         job_hazard_analysis_task_hazard_id: hazardId
     };
@@ -452,9 +524,12 @@ function submitConsequence(button, hazardId) {
     const method = consequenceId ? 'PUT' : 'POST';
     const endpoint = consequenceId ? `${apiUrlConsequences}/${consequenceId}` : apiUrlConsequences;
 
+    const taskDescriptionInput = document.getElementById('task_description_input');
+    taskDescriptionInput.value = '';
+
     fetch(endpoint, {
         method: method,
-        body: JSON.stringify(data),
+        body: JSON.stringify(data_m),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -473,28 +548,31 @@ function submitConsequence(button, hazardId) {
 function submitPreventativeMeasure(button, hazardId) {
     const preventativeMeasureElement = button.closest('.preventative-measure-item');
     const preventativeMeasureInput = preventativeMeasureElement.querySelector('.preventative-measure-input');
-    const description = preventativeMeasureInput.value.trim();
+    const description_pm = preventativeMeasureInput.value.trim();
     const preventativeMeasureId = preventativeMeasureElement.dataset.preventativeMeasureId;
 
-    if (description === "") {
+    if (description_pm === "") {
         alert("Please enter a preventative measure description.");
         return;
     }
 
     const data = {
-        description: description,
+        description: description_pm,
         job_hazard_analysis_task_hazard_id: hazardId
     };
 
     const method = preventativeMeasureId ? 'PUT' : 'POST';
-    const endpoint = preventativeMeasureId ? `${apiUrlPMs}/${preventativeMeasureId}` : apiUrlPMs;
+    const endpoint_pm = preventativeMeasureId ? `${apiUrlPMs}/${preventativeMeasureId}` : apiUrlPMs;
 
-    fetch(endpoint, {
+    const taskDescriptionInput = document.getElementById('task_description_input');
+    taskDescriptionInput.value = '';
+
+    fetch(endpoint_pm, {
         method: method,
         body: JSON.stringify(data),
         headers: {
             'Content-Type': 'application/json'
-        }
+        },
     })
     .then(response => response.json())
     .then(data => {

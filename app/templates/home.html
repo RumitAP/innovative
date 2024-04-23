@@ -52,6 +52,34 @@
     </div>
 </div>
 
+<div class="modal" id="edit-jha-modal">
+    <!-- Modal content for editing JHA -->
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Edit Job Hazard Analysis</p>
+            <button class="delete" aria-label="close" onclick="closeEditModal()"></button>
+        </header>
+        <section class="modal-card-body" id="edit-jha-modal-content">
+            <div class="field">
+                <label class="label" for="edit-title">Title</label>
+                <input class="input" type="text" id="edit-title" placeholder="Enter title">
+            </div>
+            <div class="field">
+                <label class="label" for="edit-author">Author</label>
+                <input class="input" type="text" id="edit-author" placeholder="Enter author">
+            </div>
+            <div class="field" style="display: none;">
+                <input type="hidden" id="edit-id" name="edit-id">
+            </div>            
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-success" id="save-changes" onclick="submitEditJHA()">Save Changes</button>
+            <button class="button" onclick="closeEditModal()">Cancel</button>
+        </footer>
+    </div>
+</div>
+
 <div class="modal" id="new-jha-modal">
     <div class="modal-background" onclick="toggleModal()"></div>
     <div id="error-message" class="notification is-danger is-hidden">
@@ -92,7 +120,7 @@
                     </div>
                 </div>
                 <button type="button" class="button is-link" onclick="addTask()">Add Task</button>
-                <button type="button" id="your-finish-button-id" class="button is-link">Finish</button>
+                <button type="button" id="finish-button-id" class="button is-link">Finish</button>
             </form>                  
         </section>
         <footer class="modal-card-foot">

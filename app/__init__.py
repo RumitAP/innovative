@@ -2,9 +2,10 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
-from config import DATABASE_TRACK_MODIFICATIONS, DATABASE_URL, DEFAULT_CORS
+from config import DATABASE_TRACK_MODIFICATIONS, DATABASE_URL, DEFAULT_CORS, SECRET_KEY
 
 app = Flask(__name__)
+app.secret_key = SECRET_KEY
 CORS(app, origins=DEFAULT_CORS)
 
 # Database configuration
