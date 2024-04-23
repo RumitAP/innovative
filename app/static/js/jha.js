@@ -180,9 +180,13 @@ function addTask() {
         return;
     }
 
+    const taskList = document.getElementById('tasks-container');
+    const numberOfTasks = taskList.getElementsByClassName('task-item').length;
+
     const taskData = {
         task_description: taskDescription,
-        jha_id: jsonData.jha_id
+        jha_id: jsonData.jha_id,
+        step: numberOfTasks + 1
     };
 
     fetch(apiUrlTasks, {
@@ -201,6 +205,7 @@ function addTask() {
         taskElement.classList.add('task-item');
         taskElement.dataset.taskId = taskId; // Store the ID
         taskElement.innerHTML = `
+            <span class="delete-task-button" onclick="deleteTask(this, ${taskId})">&#x1F5D1;</span>
             <div class="task-description">${taskDescription}</div>
             <div class="hazards-container"></div>
             <button type="button" class="button is-primary add-hazard-button" onclick="addHazard(this, ${taskId})">Add Hazard</button>
@@ -582,6 +587,34 @@ function submitPreventativeMeasure(button, hazardId) {
     .catch(error => {
         console.error('Error:', error);
         alert("There was an error submitting the preventative measure.");
+    });
+}
+
+function deleteTask(element, taskId) {
+    if (!confirm('Are you sure you want to delete this JHA?')) {
+        return;
+    }
+
+    fetch(`${apiUrlTasks}/${taskId}`, {  // Removed .value to directly use taskId
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error deleting JHA');
+        }
+        if (response.status === 204) {
+            alert('JHA deleted successfully');
+            const taskElement = element.closest('.task-item');
+            if (taskElement) {
+                taskElement.remove();
+            }
+        } else {
+            return response.json();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('There was a problem deleting the JHA.');
     });
 }
 

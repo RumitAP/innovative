@@ -70,6 +70,7 @@ class JobHazardAnalysisTask(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     job_hazard_analysis_id = db.Column(db.Integer, db.ForeignKey('job_hazard_analysis.id'), nullable=False, index=True)
     task_description = db.Column(db.String, nullable=False)
+    step = db.Column(db.Integer, default=1, nullable=True)
     created_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc))
     updated_utc = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc), onupdate=datetime.datetime.now(datetime.timezone.utc))
     
@@ -111,5 +112,5 @@ class JobHazardAnalysis(db.Model):
         'JobHazardAnalysisTask',
         cascade="all, delete, delete-orphan",
         back_populates='job_hazard_analysis',
-        order_by='JobHazardAnalysisTask.id'
+        order_by='JobHazardAnalysisTask.step'
     )

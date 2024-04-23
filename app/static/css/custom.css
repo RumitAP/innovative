@@ -14,14 +14,37 @@
     margin: 0.5em 0; /* Spacing between buttons and other elements */
 }
 
-/* Style for the inputs, adjust to match button sizes if desired */
 .input.hazard-input {
-    padding: 0.5em; /* Less padding to make input smaller */
-    margin-bottom: 0.5em; /* Spacing after input */
+    padding: 0.5em; 
+    margin-bottom: 0.5em; 
 }
 
-/* You may also want to adjust the label sizes if needed */
 .label {
-    display: block; /* Ensures the label takes up its own line */
-    margin-bottom: 0.2em; /* Spacing before the corresponding input/button */
+    display: block; 
+    margin-bottom: 0.2em; 
+}
+
+
+.task-item {
+    margin-bottom: 20px; /* Adds space between tasks */
+    padding: 10px; /* Padding inside each task container */
+    border: 1px solid #0c0b0b; /* Optional: adds a border around each task */
+    background-color: #342f2f58; /* Optional: background color for each task */
+}
+
+.delete-task-button, .task-description, .hazards-container, .add-hazard-button {
+    display: block; /* Makes each element take a full row */
+    margin-bottom: 8px; /* Adds vertical space between elements */
+}
+
+.task-description {
+    margin-left: 20px; /* Adds left margin for alignment */
+}
+
+.hazards-container {
+    margin-left: 20px; /* Adds left margin for alignment */
+}
+
+.add-hazard-button {
+    margin-left: 20px; /* Adds left margin for alignment */
 }

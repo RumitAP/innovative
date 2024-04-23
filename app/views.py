@@ -114,13 +114,18 @@ class JobHazardAnalysisTasksCRUDView(CRUDView):
         item.job_hazard_analysis.validate_completion()
         return jsonify(self.schema().dump(item))
     
-    def delete(self):
+    def delete(self, id):
         # Delete a record
         item = self.model.query.get_or_404(id)
+        step_deleted = item.step
         jha = item.job_hazard_analysis
+        for mod in self.model.query.filter(self.model.step>step_deleted).all():
+            mod.step -= 1
+            db.session.add(mod)
         db.session.delete(item)
         db.session.commit()
         jha.validate_completion()
+        
         return '', 204
     
 class JobHazardAnalysisTasksHazardsCRUDView(CRUDView):
