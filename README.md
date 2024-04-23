@@ -8,6 +8,12 @@ Innovative Refrigeration Systems Challenge
 First, create an empty postgres database and either `export DATABASE URL='postgresql://rumit:password@localhost/innovative'` or adjust the `config.py` file. 
 
 ```
+$ pip install virtualenv
+
+$ virtualenv venv
+
+$ source venv/bin/activate
+
 $ pip install -r requirements.txt
 
 $ flask db upgrade
