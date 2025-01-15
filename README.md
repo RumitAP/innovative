@@ -1,9 +1,7 @@
 # innovative
 Innovative Refrigeration Systems Challenge
 
-`Set up is possible in both Docker
-
-`Running on python 3.10`
+`Set up is possible both with and without Docker`
 
 ## Set up with Docker -- PORT 8001
 
@@ -55,7 +53,7 @@ $ python3 run.py
 
 * Why did I use Flask?
 
-I wanted to show my ability to pick up new frameworks in a short period of time. I'm not an expert in Flask but this app shows my ability to pick up a new framework and implement it in a functional manner in a couple of days. This was much more different than Django than I originally expected. BUT it was a fun learning experience. 
+I wanted to show my ability to pick up new frameworks in a short period of time. I'm not an expert in Flask but this app shows my ability to pick up a new framework and implement it in a functional manner in a couple of days. This was very different than Django than I originally expected. BUT it was a fun learning experience. 
 
 * Why did I choose to the database relationship schema the way they did?
 
